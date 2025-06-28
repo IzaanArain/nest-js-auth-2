@@ -1,4 +1,10 @@
-import { IsString, IsEmail, Matches, MinLength } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  Matches,
+  MinLength,
+  IsNotEmpty,
+} from 'class-validator';
 
 export class SignupDto {
   @IsString()
@@ -8,6 +14,7 @@ export class SignupDto {
   email: string;
 
   @IsString()
+  @IsNotEmpty()
   @MinLength(8)
   @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[\W_]).{8,}$/, {
     message:
