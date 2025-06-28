@@ -6,7 +6,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import config from './config/config';
-
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -15,12 +14,13 @@ import config from './config/config';
       cache: true,
       load: [config],
     }),
-    // JwtModule.register({ global: true, secret: 'mysecret@123' }),
-    // MongooseModule.forRoot('mongodb://localhost:27017/AuthExampleDB'),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('jwt.secret'),
+        // signOptions: { // ? you can set token expiry globally
+        //   expiresIn: '1h',
+        // },
       }),
       global: true,
     }),
@@ -30,6 +30,8 @@ import config from './config/config';
         uri: configService.getOrThrow<string>('database.connectionString'),
       }),
     }),
+    // JwtModule.register({ global: true, secret: 'mysecret@123' }),
+    // MongooseModule.forRoot('mongodb://localhost:27017/AuthExampleDB'),
     AuthModule,
   ],
   controllers: [AppController],

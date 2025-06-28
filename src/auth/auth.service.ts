@@ -9,11 +9,17 @@ import { User } from './schemas/user.schema';
 import { Model } from 'mongoose';
 import { compare, hash } from 'bcryptjs';
 import { LoginDto } from './dtos/login.dto';
-
+import { JwtService } from '@nestjs/jwt';
+import { RefreshToken } from './schemas/refresh-token.schema';
+import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private readonly UserModel: Model<User>,
+    @InjectModel(User.name)
+    private readonly UserModel: Model<User>,
+    private readonly jwtService: JwtService,
+    @InjectModel(RefreshToken.name)
+    private readonly RefreshTokenModel: Model<RefreshToken>,
   ) {}
 
   async signup(signupData: SignupDto) {
@@ -48,5 +54,43 @@ export class AuthService {
       throw new UnauthorizedException('Wrong credentials');
     }
     // TODO: generate JWT tokens
+    const tokens = await this.generateUserTokens(user._id as string);
+
+    return {
+      ...tokens,
+      userId: user._id,
+    };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    const token = await this.RefreshTokenModel.findOneAndDelete({
+      token: refreshToken,
+      expiryDate: { $gte: new Date() },
+    });
+
+    if (!token) {
+      throw new UnauthorizedException('Refresh token is invalid!');
+    }
+
+    return this.generateUserTokens(token.userId.toString());
+  }
+
+  async generateUserTokens(userId: string) {
+    const accessToken = this.jwtService.sign({ userId }, { expiresIn: '1h' }); // ? you can set secret in sign options as well
+    const refreshToken = uuidv4();
+    await this.storeRefreshToken(refreshToken, userId);
+    return { accessToken, refreshToken };
+  }
+
+  async storeRefreshToken(token: string, userId: string) {
+    // TODO: calculate expiry date 3 days from now
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 3);
+
+    await this.RefreshTokenModel.create({
+      token,
+      userId,
+      expiryDate,
+    });
   }
 }
