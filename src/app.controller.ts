@@ -8,12 +8,12 @@ import { AuthGuard } from './guards/auth.guard';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  // @Get()
-  // getHello(): string {
-  //   return this.appService.getHello();
-  // }
-
   @Get()
+  getHello(): string {
+    return this.appService.getHello();
+  }
+
+  @Get('some-protected-route')
   someProtectedRoute(@Req() req: Request & { userId: string }) {
     console.log({ userId: req.userId });
     return { message: 'Accessed Resource', userId: req.userId };
