@@ -6,7 +6,7 @@ import {
 import { SignupDto } from './dtos/signup.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './schemas/user.schema';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { compare, hash } from 'bcryptjs';
 import { LoginDto } from './dtos/login.dto';
 import { JwtService } from '@nestjs/jwt';
@@ -63,7 +63,7 @@ export class AuthService {
   }
 
   async refreshTokens(refreshToken: string) {
-    const token = await this.RefreshTokenModel.findOneAndDelete({
+    const token = await this.RefreshTokenModel.findOne({
       token: refreshToken,
       expiryDate: { $gte: new Date() },
     });
@@ -86,11 +86,11 @@ export class AuthService {
     // TODO: calculate expiry date 3 days from now
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 3);
-
-    await this.RefreshTokenModel.create({
-      token,
-      userId,
-      expiryDate,
-    });
+    // ? updateOne() returns only meta data
+    await this.RefreshTokenModel.findOneAndUpdate(
+      { userId: new mongoose.Types.ObjectId(userId) }, // ? filter fields are used to construct the new document.
+      { $set: { expiryDate, token } },
+      { upsert: true, new: true },
+    );
   }
 }
