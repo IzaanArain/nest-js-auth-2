@@ -6,12 +6,14 @@ import { ConfigService } from '@nestjs/config';
 import { RefreshTokenDto } from './dtos/refresh-tokens.dto';
 import {
   ApiBadRequestResponse,
+  // ApiBody,
   // ApiCreatedResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 // import { User } from './schemas/user.schema';
 
@@ -35,6 +37,7 @@ export class AuthController {
   //   description: 'Provide success message for successful signup!',
   //   type: User,
   // })
+  // @ApiBody({ type: SignupDto }) // ? I think not needed any more , not sure
   @ApiBadRequestResponse({ description: 'Email already in use' })
   async signUp(@Body() signupData: SignupDto) {
     console.log(this.configService.get('database.connectionString'));
@@ -48,8 +51,10 @@ export class AuthController {
     description: 'Provide success message for successful login!',
     type: LoginDto,
   })
+  // @ApiBody({ type: LoginDto })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiBadRequestResponse({ description: 'Invalid credentials provided' })
+  @ApiUnauthorizedResponse({ description: 'Invalid credentials provided' })
   async login(@Body() credentials: LoginDto) {
     return this.authService.login(credentials);
   }

@@ -9,6 +9,7 @@ import {
 
 export class SignupDto {
   @ApiPropertyOptional({
+    type: String,
     name: 'name',
     description: 'The name of the user',
     example: 'John Doe',
@@ -25,6 +26,7 @@ export class SignupDto {
   email: string;
 
   @ApiProperty({
+    type: String,
     description: 'The password of the user',
     example: 'Abcd@1234',
     required: true,
