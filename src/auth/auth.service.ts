@@ -39,6 +39,11 @@ export class AuthService {
       email,
       password: hashedPassword,
     });
+
+    return {
+      success: true,
+      message: 'Sign up successful!',
+    };
   }
 
   async login(credentials: LoginDto) {

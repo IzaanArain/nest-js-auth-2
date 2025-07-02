@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
 import config from './config/config';
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import config from './config/config';
     // JwtModule.register({ global: true, secret: 'mysecret@123' }),
     // MongooseModule.forRoot('mongodb://localhost:27017/AuthExampleDB'),
     AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
