@@ -11,6 +11,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { User } from 'src/auth/schemas/user.schema';
 
 @ApiTags('USER')
 @Controller('users')
@@ -26,7 +27,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Fetch a list of users' })
   @ApiOkResponse({
     description: 'List of users retrieved successfully',
-    isArray: true,
+    type: [User],
+    // isArray: true, // ? you can define a type like [GetAllUsersResponseDto] for array values
   })
   findAll() {
     return this.usersService.findAll();

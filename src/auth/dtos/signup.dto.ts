@@ -9,7 +9,9 @@ import {
 
 export class SignupDto {
   @ApiPropertyOptional({
+    name: 'name',
     description: 'The name of the user',
+    example: 'John Doe',
   })
   @IsString()
   name: string;
